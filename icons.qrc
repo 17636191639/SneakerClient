@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/麦孩图.png</file>
+        <file>icons/head.png</file>
+    </qresource>
+</RCC>
