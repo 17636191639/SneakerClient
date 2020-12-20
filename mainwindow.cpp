@@ -46,7 +46,7 @@ void MainWindow::slotLoginResult(bool result)
         }else if(GlobalValues::g_localUser.getRole() == "买家")
         {
             initBuyerUI();
-            setFixedSize(800, 600);
+            setFixedSize(600, 800);
             qDebug() << "Buyer UI Init";
 
         }
