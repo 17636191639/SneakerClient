@@ -11,6 +11,7 @@ Home::Home(QWidget *parent) :
     ui->setupUi(this);
     ///获取信息
 
+
     ///刷新页面
     updateTalbeWidget();
 }
