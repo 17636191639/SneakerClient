@@ -1,4 +1,4 @@
-#ifndef PHOTOINFO_H
+﻿#ifndef PHOTOINFO_H
 #define PHOTOINFO_H
 #include <QString>
 

@@ -1,14 +1,17 @@
-#include "msgproc.h"
+﻿#include "msgproc.h"
 #include "globalvalues.h"
 #include <QDataStream>
 #include <QDebug>
 #include "shoesinfo.h"
+#include <QImage>
 
 MsgProc::MsgProc(QThread *parent) : QThread(parent)
 {
     m_isExit = false;
     m_tcpBlockSize = 0;
     m_tcpSocket = new QTcpSocket(this);
+    m_count = 0;
+    m_byte.clear();
 
     connect(m_tcpSocket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
     m_tcpSocket->connectToHost("localhost", 5555);
@@ -43,6 +46,7 @@ void MsgProc::parseUserAsk(QString msg)
     case CMD_ViewShopCart_P: parseBuyerViewShopCart(list.at(1)); break;
     case CMD_ViewEvaluation_W: parseBuyerViewEvaluation(list.at(1)); break;
     case CMD_UploadEvaluation_U: parseBuyerUploadEvaluation(list.at(1)); break;
+    case CMD_GetShoesPhoto_A: parseBuyerGetShoesPhoto(list.at(1)); break;
     default:
         break;
     }
@@ -128,9 +132,10 @@ void MsgProc::parseBuyerGetShoesInfo(QString data)
             ShoesInfo info;
             info.setID(infoList.at(0));
             info.setStoreID(infoList.at(1));
-            info.setShoesName(infoList.at(2));
-            info.setBottomPrice(infoList.at(3));
-            info.setFreight(infoList.at(4));
+            info.setPhotoID(infoList.at(2));
+            info.setShoesName(infoList.at(3));
+            info.setBottomPrice(infoList.at(4));
+            info.setFreight(infoList.at(5));
             GlobalValues::g_shoesInfoList->append(info);
             list.pop_front();
         }
@@ -157,7 +162,10 @@ void MsgProc::parseBuyerUploadEvaluation(QString data)
 {
 
 }
-
+void MsgProc::parseBuyerGetShoesPhoto(QString data)
+{
+    qDebug() << m_count++;
+}
 
 
 void MsgProc::exitThread(void)
@@ -173,32 +181,76 @@ void MsgProc::run()
         {
             QString msg = GlobalValues::g_msgQueue.dequeue();
             parseUserAsk(msg);  //解析命令
-        }
 
+        }
+        //qDebug() << m_tcpSocket->state();
         msleep(20);
     }
 }
 void MsgProc::slotReadyRead()
 {
-    QDataStream in(m_tcpSocket);
-    in.setVersion(QDataStream::Qt_4_6);
 
-    if(m_tcpBlockSize == 0)
+
+    if(m_tcpSocket->bytesAvailable() == 65536)  //接受数据满包说明没发完
     {
-        if(m_tcpSocket->bytesAvailable()<sizeof(quint16))
-            return;
+        m_byte.append(m_tcpSocket->readAll());
+    }else
+    {
+        m_byte.append(m_tcpSocket->readAll());      //传输的变少了
 
-        in >> m_tcpBlockSize;
+        QDataStream in(m_byte);
+        in.setVersion(QDataStream::Qt_4_6);
+
+        if(m_tcpBlockSize == 0)
+        {
+            if(m_byte.size() < sizeof(quint16))
+            {
+                return;
+            }
+
+            in >> m_tcpBlockSize;  //获取数据的长度
+        }
+
+        if(m_byte.size() - 2 < m_tcpBlockSize) //总接受大小-2个字节就是数据大小
+        {
+            return;
+        }
+
+        QString msg;
+        in >> msg;
+        qDebug() << "Client Recv: " << msg;   //如果是图片msg为 A#buyer_id|photo_id
+
+        QStringList msgList = msg.split("#");
+        if(msgList.at(0) == CMD_GetShoesPhoto_A)
+        {
+            //应专门起一个线程处理图片
+            QStringList list = msgList.at(1).split("|");
+            QStringList photoInfo = list.at(1).split("&");
+            QByteArray imgArray;
+            in >> imgArray;
+
+            QImage img;
+            if(img.loadFromData(imgArray))  //图片加载成功
+            {
+                QString savePath = QString("./shoes_photo/") + photoInfo.at(0) + QString(" (1).jpg") ;
+
+                qDebug() << "img.save():" << img.save(savePath);
+                emit signalSavePhotoSuccess(photoInfo.at(0));
+                //qDebug() << "img.save();" << savePath;
+            }
+
+
+        }else
+        {
+            GlobalValues::g_msgQueue.enqueue(msg);
+        }
+        m_tcpBlockSize = 0;
+        m_byte.clear();
     }
 
-    if(m_tcpSocket->bytesAvailable() < m_tcpBlockSize)
-        return;
 
-    QString msg;
-    in >> msg;
-    qDebug() << "Client Recv: " << msg;
-    GlobalValues::g_msgQueue.enqueue(msg);
-    m_tcpBlockSize = 0;
+
+
 }
 void MsgProc::slotSendMsg(QString msg)
 {
@@ -210,7 +262,6 @@ void MsgProc::slotSendMsg(QString msg)
     out << msg;
     out.device()->seek(0);
     out << (quint16)(buffer.size() - sizeof(quint16));
-
-    qDebug() << "Client Send: " << msg;
     m_tcpSocket->write(buffer);
+    qDebug() << "Client Send: " << msg;
 }

@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "globalvalues.h"
 #include <QMessageBox>
@@ -47,6 +47,7 @@ void MainWindow::slotLoginResult(bool result)
         {
             initBuyerUI();
             setFixedSize(600, 800);
+            ui->mainToolBar->show();
             qDebug() << "Buyer UI Init";
 
         }
@@ -55,12 +56,7 @@ void MainWindow::slotLoginResult(bool result)
        m_login->userLoginFail();
     }
 }
-void MainWindow::slotGetShoesInfo(void)
-{
-    QString msg = QString(CMD_GetShoes_T) + QString("#") + GlobalValues::g_localUser.getID();
-    qDebug() << msg;
-    m_msgProc->slotSendMsg(msg);
-}
+
 void MainWindow::initSellerUI(void)
 {
 
@@ -71,5 +67,19 @@ void MainWindow::initBuyerUI(void)
     m_home = new Home(ui->widget);
     connect(m_home, SIGNAL(signalGetShoesInfo()), this, SLOT(slotGetShoesInfo()));
     connect(m_msgProc, SIGNAL(signalGetShoesResult(bool)), m_home, SLOT(slotGetShoesResult(bool)));
+    connect(m_home, SIGNAL(signalGetShoesPhoto(QString, QString)), this, SLOT(slotGetPhotoForPhotoID(QString, QString)));
+    connect(m_msgProc, SIGNAL(signalSavePhotoSuccess(QString)), m_home, SLOT(slotSavePhotoSucess(QString)));
+    emit m_home->signalGetShoesInfo();
+
     m_home->show();
+}
+void MainWindow::slotGetShoesInfo(void)
+{
+    QString msg = QString(CMD_GetShoes_T) + QString("#") + GlobalValues::g_localUser.getID();
+    m_msgProc->slotSendMsg(msg);
+}
+void MainWindow::slotGetPhotoForPhotoID(QString buyerID, QString photoID)
+{
+    QString msg = QString(CMD_GetShoesPhoto_A) + QString("#") +buyerID + QString("|") + photoID;
+    m_msgProc->slotSendMsg(msg);
 }

@@ -1,18 +1,20 @@
-#include "shoesinfo.h"
+﻿#include "shoesinfo.h"
 
 ShoesInfo::ShoesInfo()
 {
     m_id.clear();
     m_storeID.clear();
+    m_photoID.clear();
     m_shoesName.clear();
     m_bottomPrice.clear();
     m_freight.clear();
 }
-ShoesInfo::ShoesInfo(const QString &id, const QString &storeID,
+ShoesInfo::ShoesInfo(const QString &id, const QString &storeID, const QString &photoID,
                      const QString &shoesName,const QString &bottomPrice, const QString &freight)
 {
     m_id = id;
     m_storeID = storeID;
+    m_photoID = photoID;
     m_shoesName = shoesName;
     m_bottomPrice = bottomPrice;
     m_freight = freight;
@@ -26,6 +28,11 @@ void ShoesInfo::setID(const QString &id)
 void ShoesInfo::setStoreID(const QString &storeID)
 {
     m_storeID = storeID;
+
+}
+void ShoesInfo::setPhotoID(const QString &photoID)
+{
+    m_photoID = photoID;
 
 }
 void ShoesInfo::setShoesName(const QString &shoesName)
@@ -50,6 +57,10 @@ const QString &ShoesInfo::getID(void) const
 const QString &ShoesInfo::getStoreID(void) const
 {
     return m_storeID;
+}
+const QString &ShoesInfo::getPhotoID(void) const
+{
+    return m_photoID;
 }
 const QString &ShoesInfo::getShoesName(void) const
 {

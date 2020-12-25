@@ -1,8 +1,9 @@
-#ifndef MSGPROC_H
+﻿#ifndef MSGPROC_H
 #define MSGPROC_H
 
 #include <QThread>
 #include <QTcpSocket>
+#include <QByteArray>
 
 class MsgProc : public QThread
 {
@@ -14,6 +15,7 @@ signals:
     void signalSendMsg(QString msg);
     void signalLoginResult(bool);
     void signalGetShoesResult(bool);
+    void signalSavePhotoSuccess(QString photoID);
 public:
     explicit MsgProc(QThread *parent = 0);
     ~MsgProc();
@@ -25,6 +27,8 @@ private:
     bool m_isExit;
     quint16 m_tcpBlockSize;
     QTcpSocket *m_tcpSocket;
+    int m_count;  //计算消息数量
+    QByteArray m_byte;
 
 
      void parseUserAsk(QString msg);/////协议解析
@@ -48,6 +52,7 @@ private:
      void parseBuyerViewShopCart(QString data);
      void parseBuyerViewEvaluation(QString data);
      void parseBuyerUploadEvaluation(QString data);
+     void parseBuyerGetShoesPhoto(QString data);
 };
 
 #endif // MSGPROC_H

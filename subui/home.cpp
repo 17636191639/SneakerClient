@@ -1,17 +1,21 @@
 ﻿#include "home.h"
 #include "ui_home.h"
 #include "globalvalues.h"
-#include "shoesitem.h"
+
 #include <QMessageBox>
 #include <QDebug>
+#include <QImage>
+
 Home::Home(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Home)
 {
     ui->setupUi(this);
+    ui->tableWidget->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+    itemMap.clear();
     ///获取信息
 
-
+    //on_pb_refresh_clicked();
     ///刷新页面
     //updateTalbeWidget();
 }
@@ -23,6 +27,7 @@ Home::~Home()
 void Home::updateTalbeWidget(void)
 {
     ui->tableWidget->clear();
+    itemMap.clear();
     ui->tableWidget->setColumnCount(2);  //设置列数
 
     int count;
@@ -40,15 +45,27 @@ void Home::updateTalbeWidget(void)
     {
 
             ShoesItem *item = new ShoesItem(GlobalValues::g_shoesInfoList->at(i).getShoesName(),
-                                            GlobalValues::g_shoesInfoList->at(i).getBottomPrice());
+                                            GlobalValues::g_shoesInfoList->at(i).getBottomPrice(),
+                                            GlobalValues::g_shoesInfoList->at(i).getPhotoID());
+
+
+
+            if(!item->setItemPhoto())   //如果本地无图片则向服务器申请图片
+            {
+                emit signalGetShoesPhoto(GlobalValues::g_localUser.getID(),
+                                         GlobalValues::g_shoesInfoList->at(i).getPhotoID());
+                QSleep(50);
+            }
             ui->tableWidget->setCellWidget(i / 2, flag, item);
+            itemMap.insert(GlobalValues::g_shoesInfoList->at(i).getPhotoID(), item);
             flag = !flag;
-//            i++;
-//            item = new ShoesItem(GlobalValues::g_shoesInfoList->at(i).getShoesName(),
-//                                                        GlobalValues::g_shoesInfoList->at(i).getBottomPrice());
-//            ui->tableWidget->setCellWidget(i / 2, 1, item);
+
+
+//            QString msg = QString(CMD_GetShoesPhoto_A) + QString("#") + GlobalValues::g_shoesInfoList->at(i).getID();
+//            m_proc->slotSendMsg(msg);
 
     }
+
 /////////////////   用listWidget显示   //////////////////////
 //    ui->listWidget->clear();
 //    for(int i = 0; i < GlobalValues::g_shoesInfoList->count(); i++)
@@ -81,3 +98,20 @@ void Home::slotGetShoesResult(bool result)
     }
 
 }
+
+void Home::slotSavePhotoSucess(QString photoID)
+{
+    QString imgPath = QString("./shoes_photo/") + photoID + QString(" (1).jpg");
+
+    QImage img;
+    if(img.load(imgPath))
+    {
+        if(itemMap.contains(photoID))
+        {
+            itemMap[photoID]->setItemPhoto();
+            qDebug() << "111111111111111111111111111111111111111111111";
+        }
+        //item->setItemPhoto(img);
+    }
+}
+

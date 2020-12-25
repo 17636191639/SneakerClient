@@ -1,4 +1,4 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
@@ -17,6 +17,7 @@ public slots:
     void slotUserLogin(QString id, QString pswd);
     void slotLoginResult(bool result);
     void slotGetShoesInfo(void);
+    void slotGetPhotoForPhotoID(QString buyerID, QString photoID);
 
 public:
     explicit MainWindow(QWidget *parent = 0);

@@ -1,4 +1,4 @@
-#ifndef GLOBALVALUES_H
+﻿#ifndef GLOBALVALUES_H
 #define GLOBALVALUES_H
 #include <QQueue>
 #include "userinfo.h"
@@ -28,6 +28,7 @@ enum COMMAND{
     CMD_ViewShopCart_P = 'P',     //购物车信息
     CMD_ViewEvaluation_W = 'W',         //评价信息
     CMD_UploadEvaluation_U = 'U',         //上传评价
+    CMD_GetShoesPhoto_A = 'A',
     ///卖家请求命令
     CMD_GetShoesInfo_G = 'G',    //商品信息
     CMD_NewShoes_N = 'N',        //上架商品
@@ -46,5 +47,5 @@ public:
     static UserInfo g_localUser;
     static ShoesInfoList *g_shoesInfoList;
 };
-
+void QSleep(unsigned int msec);
 #endif // GLOBALVALUES_H
