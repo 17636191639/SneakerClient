@@ -196,55 +196,66 @@ void MsgProc::slotReadyRead()
         m_byte.append(m_tcpSocket->readAll());
     }else
     {
-        m_byte.append(m_tcpSocket->readAll());      //传输的变少了
+        m_byte.append(m_tcpSocket->readAll());
 
-        QDataStream in(m_byte);
-        in.setVersion(QDataStream::Qt_4_6);
-
-        if(m_tcpBlockSize == 0)
+        //处理粘包
+        int readSize = 0;
+        QByteArray tempByte = m_byte;
+        qDebug() << "m_byte.size(): " << m_byte.size();
+        while(m_byte.size() - readSize)
         {
-            if(m_byte.size() < sizeof(quint16))
+            QDataStream in(tempByte);
+            in.setVersion(QDataStream::Qt_4_6);
+
+            if(m_tcpBlockSize == 0)
+            {
+                if(tempByte.size() < sizeof(quint32))
+                {
+                    return;
+                }
+                in >> m_tcpBlockSize;  //获取数据的长度
+            }
+            //处理半包   数据只接受了一半  跳出函数继续接受
+
+            if(tempByte.size() - sizeof(quint32) < m_tcpBlockSize) //总接受大小-2个字节就是数据大小
             {
                 return;
             }
+            qDebug() << "当前数据包大小：" << tempByte.size();
+            QString msg;
+            in >> msg;
+            qDebug() << "Client Recv: " << msg;
 
-            in >> m_tcpBlockSize;  //获取数据的长度
-        }
 
-        if(m_byte.size() - 2 < m_tcpBlockSize) //总接受大小-2个字节就是数据大小
-        {
-            return;
-        }
-
-        QString msg;
-        in >> msg;
-        qDebug() << "Client Recv: " << msg;   //如果是图片msg为 A#buyer_id|photo_id
-
-        QStringList msgList = msg.split("#");
-        if(msgList.at(0) == CMD_GetShoesPhoto_A)
-        {
-            //应专门起一个线程处理图片
-            QStringList list = msgList.at(1).split("|");
-            QStringList photoInfo = list.at(1).split("&");
-            QByteArray imgArray;
-            in >> imgArray;
-
-            QImage img;
-            if(img.loadFromData(imgArray))  //图片加载成功
+            if(msg.at(0) == CMD_GetShoesPhoto_A)
             {
-                QString savePath = QString("./shoes_photo/") + photoInfo.at(0) + QString(" (1).jpg") ;
+                QStringList msgList = msg.split("#");
+                //应专门起一个线程处理图片
+                QStringList list = msgList.at(1).split("|");
+                QStringList photoInfo = list.at(1).split("&");
+                QByteArray imgArray;
+                in >> imgArray;
 
-                qDebug() << "img.save():" << img.save(savePath);
-                emit signalSavePhotoSuccess(photoInfo.at(0));
-                //qDebug() << "img.save();" << savePath;
+                QImage img;
+                if(img.loadFromData(imgArray))  //图片加载成功
+                {
+                    QString savePath = QString("./shoes_photo/") + photoInfo.at(0) + QString(" (1).jpg") ;
+
+                    qDebug() << "img.save():" << img.save(savePath);
+                    emit signalSavePhotoSuccess(photoInfo.at(0));
+                    //qDebug() << "img.save();" << savePath;
+                }
+
+            }else
+            {
+                GlobalValues::g_msgQueue.enqueue(msg);
             }
 
-
-        }else
-        {
-            GlobalValues::g_msgQueue.enqueue(msg);
+            readSize += m_tcpBlockSize + sizeof(quint32);
+            qDebug() << "占位符大小：" << m_tcpBlockSize << "累计已读数据" << readSize;
+            tempByte = m_byte.right(m_byte.size() - readSize);
+            m_tcpBlockSize = 0;
         }
-        m_tcpBlockSize = 0;
         m_byte.clear();
     }
 
@@ -258,10 +269,11 @@ void MsgProc::slotSendMsg(QString msg)
     QDataStream out(&buffer, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_4_6);
 
-    out << (quint16)0;
+
+    out << (quint32)0;
     out << msg;
     out.device()->seek(0);
-    out << (quint16)(buffer.size() - sizeof(quint16));
+    out << (quint32)(buffer.size() - sizeof(quint32));
     m_tcpSocket->write(buffer);
     qDebug() << "Client Send: " << msg;
 }

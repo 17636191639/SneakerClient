@@ -44,6 +44,7 @@ class GlobalValues
 {
 public:
     static QQueue<QString> g_msgQueue; //消息队列
+    static QQueue<QString> g_sendMsgQueue; //发送消息队列
     static UserInfo g_localUser;
     static ShoesInfoList *g_shoesInfoList;
 };

@@ -25,7 +25,7 @@ protected:
     void run();
 private:
     bool m_isExit;
-    quint16 m_tcpBlockSize;
+    quint32 m_tcpBlockSize;
     QTcpSocket *m_tcpSocket;
     int m_count;  //计算消息数量
     QByteArray m_byte;

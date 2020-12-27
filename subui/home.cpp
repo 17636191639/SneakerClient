@@ -54,7 +54,7 @@ void Home::updateTalbeWidget(void)
             {
                 emit signalGetShoesPhoto(GlobalValues::g_localUser.getID(),
                                          GlobalValues::g_shoesInfoList->at(i).getPhotoID());
-                QSleep(50);
+                //QSleep(50);
             }
             ui->tableWidget->setCellWidget(i / 2, flag, item);
             itemMap.insert(GlobalValues::g_shoesInfoList->at(i).getPhotoID(), item);
@@ -109,7 +109,7 @@ void Home::slotSavePhotoSucess(QString photoID)
         if(itemMap.contains(photoID))
         {
             itemMap[photoID]->setItemPhoto();
-            qDebug() << "111111111111111111111111111111111111111111111";
+            qDebug() << "show photo show photo show photo show photo";
         }
         //item->setItemPhoto(img);
     }

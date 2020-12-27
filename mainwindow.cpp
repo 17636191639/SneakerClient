@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->hide();
     setFixedSize(600,430);
     m_login = new Login(ui->widget);
-    connect(m_login, SIGNAL(signalUserLogin(QString, QString)), this, SLOT(slotUserLogin(QString, QString)));\
+    connect(m_login, SIGNAL(signalUserLogin(QString, QString)), this, SLOT(slotUserLogin(QString, QString)));
 
     m_msgProc = new MsgProc;
     connect(m_msgProc, SIGNAL(signalLoginResult(bool)), this, SLOT(slotLoginResult(bool)));

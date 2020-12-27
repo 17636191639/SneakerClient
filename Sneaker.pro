@@ -24,6 +24,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 include (network/network.pri)
 include (subinfo/subinfo.pri)
 include (subui/subui.pri)
+include (threads/threads.pri)
+
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
