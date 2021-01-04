@@ -11,13 +11,10 @@ Home::Home(QWidget *parent) :
     ui(new Ui::Home)
 {
     ui->setupUi(this);
-    ui->tableWidget->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+    ui->tableWidget->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);//设置滚动条平滑滚动
     itemMap.clear();
-    ///获取信息
 
-    //on_pb_refresh_clicked();
-    ///刷新页面
-    //updateTalbeWidget();
+    m_parentWidget = parent;
 }
 
 Home::~Home()
@@ -54,7 +51,6 @@ void Home::updateTalbeWidget(void)
             {
                 emit signalGetShoesPhoto(GlobalValues::g_localUser.getID(),
                                          GlobalValues::g_shoesInfoList->at(i).getPhotoID());
-                //QSleep(50);
             }
             ui->tableWidget->setCellWidget(i / 2, flag, item);
             itemMap.insert(GlobalValues::g_shoesInfoList->at(i).getPhotoID(), item);
@@ -115,3 +111,27 @@ void Home::slotSavePhotoSucess(QString photoID)
     }
 }
 
+
+void Home::on_tableWidget_clicked(const QModelIndex &index)
+{
+    this->hide();
+    m_shoesDetailsUI = new ShoesDetailUI(GlobalValues::g_shoesInfoList->at(index.row() * 2 + index.column()).getID(),
+                                       GlobalValues::g_shoesInfoList->at(index.row() * 2 + index.column()).getShoesName(),
+                                       m_parentWidget, this);
+    //connect(m_,SIGNAL(signalGetShoesDetailsResult(bool)))
+
+    m_shoesDetailsUI->show();
+
+
+    emit signalGetShoesDetails(GlobalValues::g_localUser.getID(),
+                               GlobalValues::g_shoesInfoList->at(index.row() * 2 + index.column()).getID());
+}
+void Home::slotGetShoesDetailsResult(bool res)
+{
+    if(res)
+    {
+        m_shoesDetailsUI->setShoesDetails();
+
+    }
+
+}

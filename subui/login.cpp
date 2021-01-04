@@ -1,4 +1,4 @@
-#include "login.h"
+﻿#include "login.h"
 #include "ui_login.h"
 #include <QMessageBox>
 
@@ -7,7 +7,7 @@ Login::Login(QWidget *parent) :
     ui(new Ui::Login)
 {
     ui->setupUi(this);
-
+    this->setWindowFlags(Qt::FramelessWindowHint);
 }
 
 Login::~Login()
@@ -39,4 +39,9 @@ void Login::userLoginFail(void)
 {
     QMessageBox::warning(this, "警告", "账号或密码错误!",
                          QMessageBox::Retry|QMessageBox::Close);
+}
+
+void Login::on_pushButton_clicked()
+{
+    this->close();
 }

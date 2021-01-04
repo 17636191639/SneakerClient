@@ -18,7 +18,8 @@ public slots:
     void slotLoginResult(bool result);
     void slotGetShoesInfo(void);
     void slotGetPhotoForPhotoID(QString buyerID, QString photoID);
-
+    void slotGetShoesDetails(QString buyerID, QString shoesID);
+    void slotSendMsgToServer(QString msg);
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();

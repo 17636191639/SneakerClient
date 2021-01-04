@@ -16,6 +16,7 @@ signals:
     void signalLoginResult(bool);
     void signalGetShoesResult(bool);
     void signalSavePhotoSuccess(QString photoID);
+    void signalGetShoesDetailsResult(bool);
 public:
     explicit MsgProc(QThread *parent = 0);
     ~MsgProc();
@@ -27,7 +28,6 @@ private:
     bool m_isExit;
     quint32 m_tcpBlockSize;
     QTcpSocket *m_tcpSocket;
-    int m_count;  //计算消息数量
     QByteArray m_byte;
 
 
@@ -53,6 +53,7 @@ private:
      void parseBuyerViewEvaluation(QString data);
      void parseBuyerUploadEvaluation(QString data);
      void parseBuyerGetShoesPhoto(QString data);
+     void parseBuyerGetShoesDetails(QString data);
 };
 
 #endif // MSGPROC_H

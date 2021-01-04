@@ -4,13 +4,13 @@
 #include <QDebug>
 #include "shoesinfo.h"
 #include <QImage>
+#include "shoesdetails.h"
 
 MsgProc::MsgProc(QThread *parent) : QThread(parent)
 {
     m_isExit = false;
     m_tcpBlockSize = 0;
     m_tcpSocket = new QTcpSocket(this);
-    m_count = 0;
     m_byte.clear();
 
     connect(m_tcpSocket, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
@@ -47,6 +47,7 @@ void MsgProc::parseUserAsk(QString msg)
     case CMD_ViewEvaluation_W: parseBuyerViewEvaluation(list.at(1)); break;
     case CMD_UploadEvaluation_U: parseBuyerUploadEvaluation(list.at(1)); break;
     case CMD_GetShoesPhoto_A: parseBuyerGetShoesPhoto(list.at(1)); break;
+    case CMD_GetShoesDetail_F:parseBuyerGetShoesDetails(list.at(1)); break;
     default:
         break;
     }
@@ -145,6 +146,8 @@ void MsgProc::parseBuyerGetShoesInfo(QString data)
     {
         emit signalGetShoesResult(false);
     }
+
+
 }
 void MsgProc::parseBuyerGetOrder(QString data)
 {
@@ -164,9 +167,44 @@ void MsgProc::parseBuyerUploadEvaluation(QString data)
 }
 void MsgProc::parseBuyerGetShoesPhoto(QString data)
 {
-    qDebug() << m_count++;
-}
 
+}
+void MsgProc::parseBuyerGetShoesDetails(QString data)
+{
+    QStringList list = data.split("|");
+    int result = data.at(0).toLatin1();
+    list.pop_front();
+    if(result == RES_Success)
+    {
+        if(list.at(0) == GlobalValues::g_localUser.getID())
+        {
+            list.pop_front(); //将链表中存储的buyerID删除
+            GlobalValues::g_shoesDetailsList->clear();
+            while(!list.isEmpty())
+            {
+                QString shoesDetails = list.at(0);
+                qDebug() << shoesDetails;
+                QStringList infoList = shoesDetails.split("&");
+                ShoesDetails info;
+                info.setID(infoList.at(0));
+                info.setShoesID(infoList.at(1));
+                info.setPhotoID(infoList.at(2));
+                info.setSize(infoList.at(3));
+                info.setColor(infoList.at(4));
+                info.setPrice(infoList.at(5));
+                info.setStock(infoList.at(6));
+                GlobalValues::g_shoesDetailsList->append(info);
+                list.pop_front();
+            }
+
+            emit signalGetShoesDetailsResult(true);
+        }
+
+    }else
+    {
+        emit signalGetShoesDetailsResult(false);
+    }
+}
 
 void MsgProc::exitThread(void)
 {
@@ -181,9 +219,7 @@ void MsgProc::run()
         {
             QString msg = GlobalValues::g_msgQueue.dequeue();
             parseUserAsk(msg);  //解析命令
-
         }
-        //qDebug() << m_tcpSocket->state();
         msleep(20);
     }
 }
@@ -258,10 +294,6 @@ void MsgProc::slotReadyRead()
         }
         m_byte.clear();
     }
-
-
-
-
 }
 void MsgProc::slotSendMsg(QString msg)
 {

@@ -29,6 +29,8 @@ enum COMMAND{
     CMD_ViewEvaluation_W = 'W',         //评价信息
     CMD_UploadEvaluation_U = 'U',         //上传评价
     CMD_GetShoesPhoto_A = 'A',
+    CMD_GetShoesDetail_F = 'F', //获取商品详情
+
     ///卖家请求命令
     CMD_GetShoesInfo_G = 'G',    //商品信息
     CMD_NewShoes_N = 'N',        //上架商品
@@ -47,6 +49,7 @@ public:
     static QQueue<QString> g_sendMsgQueue; //发送消息队列
     static UserInfo g_localUser;
     static ShoesInfoList *g_shoesInfoList;
+    static ShoesDetailsList *g_shoesDetailsList;
 };
 void QSleep(unsigned int msec);
 #endif // GLOBALVALUES_H

@@ -1,4 +1,4 @@
-#ifndef LOGIN_H
+﻿#ifndef LOGIN_H
 #define LOGIN_H
 
 #include <QWidget>
@@ -21,6 +21,8 @@ private slots:
     void on_pb_login_clicked();
 
     void on_pb_signin_clicked();
+
+    void on_pushButton_clicked();
 
 private:
     Ui::Login *ui;

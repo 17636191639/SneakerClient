@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>icons/麦孩图.png</file>
         <file>icons/head.png</file>
         <file>icons/brand-reddit.png</file>
         <file>icons/clipboard-list.png</file>
@@ -9,5 +8,9 @@
         <file>icons/rocket.png</file>
         <file>icons/shopping-cart.png</file>
         <file>icons/搜索.png</file>
+        <file>icons/麦孩图.png</file>
+        <file>icons/登录插图.png</file>
+        <file>icons/登录背景.png</file>
+        <file>icons/关闭.png</file>
     </qresource>
 </RCC>
