@@ -3,12 +3,12 @@
 
 #include <QWidget>
 #include <QImage>
-
+#include "photo.h"
 namespace Ui {
 class ShoesItem;
 }
 
-class ShoesItem : public QWidget
+class ShoesItem : public Photo
 {
     Q_OBJECT
 
@@ -17,9 +17,10 @@ public:
                        QString photoID = "", QWidget *parent = 0);
     ~ShoesItem();
 
-    bool setItemPhoto(void);
+
     void setShoesName(const QString & shoesName);
     void setShoesPrice(const QString & shoesPrice);
+    bool setPhoto(void);
 private:
     Ui::ShoesItem *ui;
 

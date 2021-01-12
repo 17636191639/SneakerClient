@@ -51,7 +51,7 @@ void MainWindow::slotLoginResult(bool result)
         }else if(GlobalValues::g_localUser.getRole() == "买家")
         {
             initBuyerUI();
-            setFixedSize(m_home->frameSize() + QSize(20, 20));
+            setFixedSize(m_home->frameSize() + QSize(20, 80));
             QDesktopWidget* desktop = QApplication::desktop();
             move((desktop->width() - this->width())/2, (desktop->height() - this->height())/2);
             ui->mainToolBar->show();
@@ -73,8 +73,9 @@ void MainWindow::initBuyerUI(void)
     m_home = new Home(ui->widget);
     connect(m_home, SIGNAL(signalGetShoesInfo()), this, SLOT(slotGetShoesInfo()));
     connect(m_msgProc, SIGNAL(signalGetShoesResult(bool)), m_home, SLOT(slotGetShoesResult(bool)));
-    connect(m_home, SIGNAL(signalGetShoesPhoto(QString, QString)), this, SLOT(slotGetPhotoForPhotoID(QString, QString)));
-    connect(m_msgProc, SIGNAL(signalSavePhotoSuccess(QString)), m_home, SLOT(slotSavePhotoSucess(QString)));
+    connect(m_home, SIGNAL(signalGetShoesPhoto(QString, QString, bool)), this, SLOT(slotGetPhotoForPhotoID(QString, QString, bool)));
+
+    //connect(m_msgProc, SIGNAL(signalSaveAllPhotoForIDSuccess(QString)), m_home, SLOT(slotSavePhotoSucess(QString)));
     connect(m_home, SIGNAL(signalGetShoesDetails(QString, QString)), this, SLOT(slotGetShoesDetails(QString, QString)));
     connect(m_msgProc, SIGNAL(signalGetShoesDetailsResult(bool)), m_home, SLOT(slotGetShoesDetailsResult(bool)));
     emit m_home->signalGetShoesInfo();
@@ -86,9 +87,17 @@ void MainWindow::slotGetShoesInfo(void)
     QString msg = QString(CMD_GetShoes_T) + QString("#") + GlobalValues::g_localUser.getID();
     m_msgProc->slotSendMsg(msg);
 }
-void MainWindow::slotGetPhotoForPhotoID(QString buyerID, QString photoID)
+void MainWindow::slotGetPhotoForPhotoID(QString buyerID, QString photoID, bool isAll)
 {
-    QString msg = QString(CMD_GetShoesPhoto_A) + QString("#") +buyerID + QString("|") + photoID;
+    QString msg = QString(CMD_GetShoesPhoto_A) + QString("#") +buyerID + QString("|") + photoID + QString("|");
+    if(isAll)
+    {
+        msg += QString("true");
+    }else
+    {
+        msg += QString("false");
+    }
+
     m_msgProc->slotSendMsg(msg);
 }
 void MainWindow::slotGetShoesDetails(QString buyerID, QString shoesID)

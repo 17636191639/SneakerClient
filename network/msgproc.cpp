@@ -5,6 +5,7 @@
 #include "shoesinfo.h"
 #include <QImage>
 #include "shoesdetails.h"
+#include "photoinfo.h"
 
 MsgProc::MsgProc(QThread *parent) : QThread(parent)
 {
@@ -253,14 +254,14 @@ void MsgProc::slotReadyRead()
             }
             //处理半包   数据只接受了一半  跳出函数继续接受
 
-            if(tempByte.size() - sizeof(quint32) < m_tcpBlockSize) //总接受大小-2个字节就是数据大小
+            if(tempByte.size() - sizeof(quint32) < m_tcpBlockSize) //总接受大小sizeof(quint32)个字节就是数据大小
             {
                 return;
             }
             qDebug() << "当前数据包大小：" << tempByte.size();
             QString msg;
             in >> msg;
-            qDebug() << "Client Recv: " << msg;
+            qDebug() << "Client Recv cmd: " << msg;
 
 
             if(msg.at(0) == CMD_GetShoesPhoto_A)
@@ -269,18 +270,55 @@ void MsgProc::slotReadyRead()
                 //应专门起一个线程处理图片
                 QStringList list = msgList.at(1).split("|");
                 QStringList photoInfo = list.at(1).split("&");
-                QByteArray imgArray;
-                in >> imgArray;
-
-                QImage img;
-                if(img.loadFromData(imgArray))  //图片加载成功
+                int count = photoInfo.at(1).toInt();
+                PhotoInfo info(photoInfo.at(0), photoInfo.at(1), photoInfo.at(2));
+                GlobalValues::g_photoInfoList->append(info);
+                if(photoInfo.at(3) == "true")
                 {
-                    QString savePath = QString("./shoes_photo/") + photoInfo.at(0) + QString(" (1).jpg") ;
+                    for(int i = 0; i < count; i++)
+                    {
+                        QByteArray imgArray;
+                        in >> imgArray;
 
-                    qDebug() << "img.save():" << img.save(savePath);
-                    emit signalSavePhotoSuccess(photoInfo.at(0));
-                    //qDebug() << "img.save();" << savePath;
+                        QImage img;
+                        if(img.loadFromData(imgArray))  //图片加载成功
+                        {
+                            QString savePath = info.getPhotoPath() + info.getID() + QString(" (%1).jpg").arg(i + 1) ;
+
+                            qDebug() << "img.save():" << img.save(savePath) << savePath;
+                            //emit signalSaveAllPhotoForIDSuccess(photoInfo.at(0));
+
+                        }
+
+                    }
+                    if(GlobalValues::setPhotoMap.contains(info.getID()))
+                    {
+                        GlobalValues::setPhotoMap[info.getID()]->setPhoto();
+                        GlobalValues::setPhotoMap.remove(info.getID());
+                    }
+                }else
+                {
+                    QByteArray imgArray;
+                    in >> imgArray;
+
+                    QImage img;
+                    if(img.loadFromData(imgArray))  //图片加载成功
+                    {
+                        QString savePath = info.getPhotoPath() + info.getID() + QString(" (1).jpg") ;
+                        qDebug() << "img.save():" << img.save(savePath);
+                        if(GlobalValues::setPhotoMap.contains(info.getID()))
+                        {
+                            GlobalValues::setPhotoMap[info.getID()]->setPhoto();
+                            GlobalValues::setPhotoMap.remove(info.getID());
+                        }
+
+                        qDebug() << "img.save();" << savePath;
+                    }
                 }
+
+                //qDebug() << "count" << count;
+
+
 
             }else
             {

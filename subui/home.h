@@ -16,11 +16,10 @@ class Home : public QWidget
     Q_OBJECT
 signals:
     void signalGetShoesInfo(void);
-    void signalGetShoesPhoto(QString buyerID, QString photoID);
+    void signalGetShoesPhoto(QString buyerID, QString photoID, bool isALL);
     void signalGetShoesDetails(QString buyerID, QString shoesID);
 public slots:
     void slotGetShoesResult(bool);
-    void slotSavePhotoSucess(QString photoID);
 
     void slotGetShoesDetailsResult(bool);
 public:
@@ -37,7 +36,7 @@ private:
     Ui::Home *ui;
     ShoesDetailUI *m_shoesDetailsUI;
     QWidget *m_parentWidget;
-    QMap<QString, ShoesItem *> itemMap;
+
 };
 
 #endif // HOME_H

@@ -15,7 +15,8 @@ signals:
     void signalSendMsg(QString msg);
     void signalLoginResult(bool);
     void signalGetShoesResult(bool);
-    void signalSavePhotoSuccess(QString photoID);
+
+    void signalSaveAllPhotoForIDSuccess(QString photoID);
     void signalGetShoesDetailsResult(bool);
 public:
     explicit MsgProc(QThread *parent = 0);

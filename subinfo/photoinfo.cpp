@@ -1,4 +1,4 @@
-#include "photoinfo.h"
+﻿#include "photoinfo.h"
 
 PhotoInfo::PhotoInfo()
 {
@@ -12,7 +12,10 @@ PhotoInfo::PhotoInfo(const QString &id, const QString &photoCount, const QString
     m_photoCount = photoCount;
     m_photoPath = photoPath;
 }
-
+void PhotoInfo::setID(const QString &ID)
+{
+    m_id = ID;
+}
 void PhotoInfo::setPhotoCount(const QString &photoCount)
 {
     m_photoCount = photoCount;

@@ -4,6 +4,11 @@
 #include "userinfo.h"
 #include "shoesinfo.h"
 #include "shoesdetails.h"
+#include <QMap>
+#include "photo.h"
+#include "photoinfo.h"
+#include "mainwindow.h"
+
 enum Oper_Data{
     Oper_None,
     Oper_Add,
@@ -42,14 +47,19 @@ enum COMMAND{
     CMD_ViewEvaluations_V = 'V',     //查看评价信息
     CMD_ReceiveEvaluation_E = 'E'    //回复评价
 };
+typedef bool (*pFun)(void);
 class GlobalValues
 {
 public:
     static QQueue<QString> g_msgQueue; //消息队列
     static QQueue<QString> g_sendMsgQueue; //发送消息队列
+    //static QMap<const QString &, pFun> setPhotoMap;//定义一个键值对， 将photoID，跟设置图片的函数存起来，以便于获取图片直接加载图片
+    static QMap<QString, Photo *> setPhotoMap;
     static UserInfo g_localUser;
     static ShoesInfoList *g_shoesInfoList;
     static ShoesDetailsList *g_shoesDetailsList;
+    static PhotoInfoList *g_photoInfoList;
+    static MainWindow *g_mainWindow;
 };
 void QSleep(unsigned int msec);
 #endif // GLOBALVALUES_H

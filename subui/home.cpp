@@ -12,7 +12,6 @@ Home::Home(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->tableWidget->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);//设置滚动条平滑滚动
-    itemMap.clear();
 
     m_parentWidget = parent;
 }
@@ -24,7 +23,7 @@ Home::~Home()
 void Home::updateTalbeWidget(void)
 {
     ui->tableWidget->clear();
-    itemMap.clear();
+
     ui->tableWidget->setColumnCount(2);  //设置列数
 
     int count;
@@ -47,13 +46,14 @@ void Home::updateTalbeWidget(void)
 
 
 
-            if(!item->setItemPhoto())   //如果本地无图片则向服务器申请图片
+            if(!item->setPhoto())   //如果本地无图片则向服务器申请图片
             {
                 emit signalGetShoesPhoto(GlobalValues::g_localUser.getID(),
-                                         GlobalValues::g_shoesInfoList->at(i).getPhotoID());
+                                         GlobalValues::g_shoesInfoList->at(i).getPhotoID(), false);
+                GlobalValues::setPhotoMap.insert(GlobalValues::g_shoesInfoList->at(i).getPhotoID(), item);
             }
             ui->tableWidget->setCellWidget(i / 2, flag, item);
-            itemMap.insert(GlobalValues::g_shoesInfoList->at(i).getPhotoID(), item);
+
             flag = !flag;
 
 
@@ -95,21 +95,6 @@ void Home::slotGetShoesResult(bool result)
 
 }
 
-void Home::slotSavePhotoSucess(QString photoID)
-{
-    QString imgPath = QString("./shoes_photo/") + photoID + QString(" (1).jpg");
-
-    QImage img;
-    if(img.load(imgPath))
-    {
-        if(itemMap.contains(photoID))
-        {
-            itemMap[photoID]->setItemPhoto();
-            qDebug() << "show photo show photo show photo show photo";
-        }
-        //item->setItemPhoto(img);
-    }
-}
 
 
 void Home::on_tableWidget_clicked(const QModelIndex &index)
@@ -125,11 +110,15 @@ void Home::on_tableWidget_clicked(const QModelIndex &index)
 
     emit signalGetShoesDetails(GlobalValues::g_localUser.getID(),
                                GlobalValues::g_shoesInfoList->at(index.row() * 2 + index.column()).getID());
+
+
+
 }
 void Home::slotGetShoesDetailsResult(bool res)
 {
     if(res)
     {
+        qDebug() << "m_shoesDetailsUI->setShoesDetails();";
         m_shoesDetailsUI->setShoesDetails();
 
     }

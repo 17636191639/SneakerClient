@@ -8,6 +8,7 @@ public:
     PhotoInfo();
     PhotoInfo(const QString &id, const QString &photoCount, const QString &photoPath);
 
+    void setID(const QString &ID);
     void setPhotoCount(const QString &photoCount);
     void setPhotoPath(const QString &photoPath);
 

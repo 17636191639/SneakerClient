@@ -17,7 +17,7 @@ public slots:
     void slotUserLogin(QString id, QString pswd);
     void slotLoginResult(bool result);
     void slotGetShoesInfo(void);
-    void slotGetPhotoForPhotoID(QString buyerID, QString photoID);
+    void slotGetPhotoForPhotoID(QString buyerID, QString photoID, bool isALL);
     void slotGetShoesDetails(QString buyerID, QString shoesID);
     void slotSendMsgToServer(QString msg);
 public:

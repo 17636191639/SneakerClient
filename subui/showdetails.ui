@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>838</width>
-    <height>596</height>
+    <width>849</width>
+    <height>617</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,10 +16,10 @@
   <widget class="QLabel" name="lb_photo">
    <property name="geometry">
     <rect>
-     <x>12</x>
-     <y>12</y>
-     <width>401</width>
-     <height>441</height>
+     <x>10</x>
+     <y>30</y>
+     <width>400</width>
+     <height>400</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -32,12 +32,12 @@
     <string>商品图片</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>423</x>
-     <y>-1</y>
-     <width>421</width>
+     <x>430</x>
+     <y>10</y>
+     <width>411</width>
      <height>601</height>
     </rect>
    </property>
@@ -244,10 +244,10 @@
   <widget class="QListWidget" name="listWidget">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>480</y>
-     <width>401</width>
-     <height>81</height>
+     <x>20</x>
+     <y>490</y>
+     <width>371</width>
+     <height>91</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -258,6 +258,17 @@
    </property>
    <property name="layoutDirection">
     <enum>Qt::LeftToRight</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QListWidget::item:hover { 
+    border-radius: 5px;
+	background-color: rgb(170, 170, 255);
+}
+ 
+QListWidget::item:selected { 
+    border-radius: 5px;
+    background-color: rgb(170, 170, 255);
+}</string>
    </property>
    <property name="flow">
     <enum>QListView::LeftToRight</enum>
