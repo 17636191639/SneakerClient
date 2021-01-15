@@ -8,6 +8,8 @@ Login::Login(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowFlags(Qt::FramelessWindowHint);
+    //this->setWindowTitle("登录");
+
 }
 
 Login::~Login()

@@ -6,3 +6,4 @@ HEADERS += \
 
 SOURCES += \
     $$PWD/msgproc.cpp
+

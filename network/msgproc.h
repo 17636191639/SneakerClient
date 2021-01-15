@@ -18,6 +18,14 @@ signals:
 
     void signalSaveAllPhotoForIDSuccess(QString photoID);
     void signalGetShoesDetailsResult(bool);
+
+    void signalGetShopCartInfo(bool);
+    void signalGetShoesDetailsFromDetailsIDResult(bool);
+    void signalGetOrderInfoResult(bool);
+    void signalGetShoesDetailsByOrderResult(bool, QString orderID);
+    void signalAddShopCartResult(bool);
+
+    void signalGetBuyerInfoResult(bool);
 public:
     explicit MsgProc(QThread *parent = 0);
     ~MsgProc();
@@ -55,6 +63,9 @@ private:
      void parseBuyerUploadEvaluation(QString data);
      void parseBuyerGetShoesPhoto(QString data);
      void parseBuyerGetShoesDetails(QString data);
+     void parseBuyerGetShoesDetailFromDetailsID(QString data);
+     void parseBuyerGetShoesDetailsByOrder(QString data);
+     void parseBuyerAddToShopCart(QString data);
+     void parseBuyerGetBuyerInfo(QString data);
 };
-
 #endif // MSGPROC_H

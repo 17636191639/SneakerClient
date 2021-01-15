@@ -14,6 +14,7 @@ Home::Home(QWidget *parent) :
     ui->tableWidget->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);//设置滚动条平滑滚动
 
     m_parentWidget = parent;
+    m_shoesDetailsUI = NULL;
 }
 
 Home::~Home()
@@ -99,7 +100,7 @@ void Home::slotGetShoesResult(bool result)
 
 void Home::on_tableWidget_clicked(const QModelIndex &index)
 {
-    this->hide();
+    //this->hide();
     m_shoesDetailsUI = new ShoesDetailUI(GlobalValues::g_shoesInfoList->at(index.row() * 2 + index.column()).getID(),
                                        GlobalValues::g_shoesInfoList->at(index.row() * 2 + index.column()).getShoesName(),
                                        m_parentWidget, this);
@@ -120,7 +121,20 @@ void Home::slotGetShoesDetailsResult(bool res)
     {
         qDebug() << "m_shoesDetailsUI->setShoesDetails();";
         m_shoesDetailsUI->setShoesDetails();
-
     }
 
+}
+void Home::slotAddShopCartResult(bool res)
+{
+    m_shoesDetailsUI->slotAddShopCartResult(res);
+}
+void Home::hideEvent(QHideEvent *event)
+{
+    qDebug() << "Home::hideEvent(QHideEvent *event)";
+    if(!m_shoesDetailsUI == NULL)
+    {
+        m_shoesDetailsUI->hide();
+        qDebug() << "子窗口隐藏";
+    }
+    event->accept();//接受隐藏事件请求
 }

@@ -22,11 +22,12 @@ public slots:
     void slotGetShoesResult(bool);
 
     void slotGetShoesDetailsResult(bool);
+    void slotAddShopCartResult(bool);
 public:
     explicit Home(QWidget *parent = 0);
     ~Home();
     void updateTalbeWidget(void);
-
+    void hideEvent(QHideEvent *event);
 private slots:
     void on_pb_refresh_clicked();
 

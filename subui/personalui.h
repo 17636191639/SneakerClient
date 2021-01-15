@@ -1,4 +1,4 @@
-#ifndef PERSONALUI_H
+﻿#ifndef PERSONALUI_H
 #define PERSONALUI_H
 
 #include <QWidget>
@@ -14,7 +14,9 @@ class PersonalUI : public QWidget
 public:
     explicit PersonalUI(QWidget *parent = 0);
     ~PersonalUI();
-
+    void askForBuyerInfo();
+public slots:
+    void slotGetBuyerInfoResult(bool);
 private:
     Ui::PersonalUI *ui;
 };

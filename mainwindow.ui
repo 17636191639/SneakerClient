@@ -33,11 +33,11 @@
     <property name="title">
      <string>显示</string>
     </property>
-    <addaction name="action_5"/>
-    <addaction name="action"/>
-    <addaction name="action_2"/>
-    <addaction name="action_3"/>
-    <addaction name="action_4"/>
+    <addaction name="home"/>
+    <addaction name="message"/>
+    <addaction name="shopcart"/>
+    <addaction name="order"/>
+    <addaction name="personalcenter"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -47,7 +47,7 @@
    </property>
    <property name="iconSize">
     <size>
-     <width>110</width>
+     <width>180</width>
      <height>60</height>
     </size>
    </property>
@@ -57,53 +57,53 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_5"/>
-   <addaction name="action"/>
-   <addaction name="action_2"/>
-   <addaction name="action_3"/>
-   <addaction name="action_4"/>
+   <addaction name="home"/>
+   <addaction name="message"/>
+   <addaction name="shopcart"/>
+   <addaction name="order"/>
+   <addaction name="personalcenter"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="action">
+  <action name="message">
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/icons/message-dots.png</normaloff>:/icons/message-dots.png</iconset>
+     <normaloff>:/icons/聊天, chat.png</normaloff>:/icons/聊天, chat.png</iconset>
    </property>
    <property name="text">
     <string>消息</string>
    </property>
   </action>
-  <action name="action_2">
+  <action name="shopcart">
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/icons/shopping-cart.png</normaloff>:/icons/shopping-cart.png</iconset>
+     <normaloff>:/icons/购物车 (1).png</normaloff>:/icons/购物车 (1).png</iconset>
    </property>
    <property name="text">
     <string>购物车</string>
    </property>
   </action>
-  <action name="action_3">
+  <action name="order">
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/icons/clipboard-list.png</normaloff>:/icons/clipboard-list.png</iconset>
+     <normaloff>:/icons/订单.png</normaloff>:/icons/订单.png</iconset>
    </property>
    <property name="text">
     <string>我的鞋柜</string>
    </property>
   </action>
-  <action name="action_4">
+  <action name="personalcenter">
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/icons/brand-reddit.png</normaloff>:/icons/brand-reddit.png</iconset>
+     <normaloff>:/icons/个人中心.png</normaloff>:/icons/个人中心.png</iconset>
    </property>
    <property name="text">
     <string>个人中心</string>
    </property>
   </action>
-  <action name="action_5">
+  <action name="home">
    <property name="icon">
     <iconset resource="icons.qrc">
-     <normaloff>:/icons/home.png</normaloff>:/icons/home.png</iconset>
+     <normaloff>:/icons/鞋.png</normaloff>:/icons/鞋.png</iconset>
    </property>
    <property name="text">
     <string>首页</string>

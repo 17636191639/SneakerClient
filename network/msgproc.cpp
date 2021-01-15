@@ -6,6 +6,8 @@
 #include <QImage>
 #include "shoesdetails.h"
 #include "photoinfo.h"
+#include "shopcart.h"
+#include "buyerinfo.h"
 
 MsgProc::MsgProc(QThread *parent) : QThread(parent)
 {
@@ -49,6 +51,11 @@ void MsgProc::parseUserAsk(QString msg)
     case CMD_UploadEvaluation_U: parseBuyerUploadEvaluation(list.at(1)); break;
     case CMD_GetShoesPhoto_A: parseBuyerGetShoesPhoto(list.at(1)); break;
     case CMD_GetShoesDetail_F:parseBuyerGetShoesDetails(list.at(1)); break;
+    case CMD_GetShoesDetailFromDetailsID_f:parseBuyerGetShoesDetailFromDetailsID(list.at(1));break;
+    case CMD_GetShoesDetailByOrder_o:parseBuyerGetShoesDetailsByOrder(list.at(1));break;
+    case CMD_AddToShopCart_p:parseBuyerAddToShopCart(list.at(1));break;
+    case CMD_GetBuyerInfo_B:parseBuyerGetBuyerInfo(list.at(1));break;
+
     default:
         break;
     }
@@ -152,11 +159,70 @@ void MsgProc::parseBuyerGetShoesInfo(QString data)
 }
 void MsgProc::parseBuyerGetOrder(QString data)
 {
+    //O# !|MH-011|O-202012070001&MH-011&D-0001&1&已付款&2020-12-07 10:10:10&null&null
+    QStringList list = data.split("|");
+    char result = data.at(0).toLatin1();
+    list.pop_front();
+    if(result == RES_Success)
+    {
+        if(list.at(0) == GlobalValues::g_localUser.getID())
+        {
+            list.pop_front(); //将链表中存储的buyerID删除
+            GlobalValues::g_orderInfoList->clear();
+            while(!list.isEmpty())
+            {
+                QString orderInfo = list.at(0);
+                qDebug() << orderInfo;
+                QStringList infoList = orderInfo.split("&");
+                OrderInfo info;
+                info.setID(infoList.at(0));
+                info.setBuyID(infoList.at(1));
+                info.setDetailID(infoList.at(2));
+                info.setCount(infoList.at(3));
+                info.setState(infoList.at(4));
+                info.setCreateDate(infoList.at(5));
+                info.setDeliveryDate(infoList.at(6));
+                info.setFinishDate(infoList.at(7));
+                GlobalValues::g_orderInfoList->append(info);
+                list.pop_front();
+            }
 
+            emit signalGetOrderInfoResult(true);
+        }
+
+    }else
+    {
+        emit signalGetOrderInfoResult(false);
+    }
 }
 void MsgProc::parseBuyerViewShopCart(QString data)
 {
+    // !|MH-011&D-0001&1|MH-011&D-0002&2
+    QStringList list = data.split("|");
+    char result = data.at(0).toLatin1();
+    list.pop_front();
+    if(result == RES_Success)
+    {
+        GlobalValues::g_shopCartList->clear();
+        while(!list.isEmpty())
+        {
+            QString shoes_info = list.at(0);
+            qDebug() << shoes_info;
+            QStringList infoList = shoes_info.split("&");
+            ShopCart info;
+            info.setID(infoList.at(0));
+            info.setDetailID(infoList.at(1));
+            info.setCount(infoList.at(2));
 
+            GlobalValues::g_shopCartList->append(info);
+            list.pop_front();
+        }
+        emit signalGetShopCartInfo(true);
+
+    }else
+    {
+        emit signalGetShopCartInfo(false);
+    }
 }
 void MsgProc::parseBuyerViewEvaluation(QString data)
 {
@@ -173,7 +239,7 @@ void MsgProc::parseBuyerGetShoesPhoto(QString data)
 void MsgProc::parseBuyerGetShoesDetails(QString data)
 {
     QStringList list = data.split("|");
-    int result = data.at(0).toLatin1();
+    char result = data.at(0).toLatin1();
     list.pop_front();
     if(result == RES_Success)
     {
@@ -346,4 +412,121 @@ void MsgProc::slotSendMsg(QString msg)
     out << (quint32)(buffer.size() - sizeof(quint32));
     m_tcpSocket->write(buffer);
     qDebug() << "Client Send: " << msg;
+}
+void MsgProc::parseBuyerGetShoesDetailFromDetailsID(QString data)
+{
+    //f# !|buyerID|D-0002&SH-0001&PS-0001&41&中帮/黑红脚趾&1170&9
+    QStringList list = data.split("|");
+    char result = data.at(0).toLatin1();
+    list.pop_front();
+    if(result == RES_Success)
+    {
+        if(list.at(0) == GlobalValues::g_localUser.getID())
+        {
+            list.pop_front(); //将链表中存储的buyerID删除
+            GlobalValues::g_shoesDetailsList->clear();
+            while(!list.isEmpty())
+            {
+                QString shoesDetails = list.at(0);
+                qDebug() << shoesDetails;
+                QStringList infoList = shoesDetails.split("&");
+                ShoesDetails info;
+                info.setID(infoList.at(0));
+                info.setShoesID(infoList.at(1));
+                info.setPhotoID(infoList.at(2));
+                info.setSize(infoList.at(3));
+                info.setColor(infoList.at(4));
+                info.setPrice(infoList.at(5));
+                info.setStock(infoList.at(6));
+                GlobalValues::g_shoesDetailsList->append(info);
+                list.pop_front();
+            }
+
+            emit signalGetShoesDetailsFromDetailsIDResult(true);
+        }
+
+    }else
+    {
+        emit signalGetShoesDetailsFromDetailsIDResult(false);
+    }
+}
+void MsgProc::parseBuyerGetShoesDetailsByOrder(QString data)
+{
+    //o# !|MH-011|orderID|D-0001&SH-0001&PS-0001&40&中帮/黑红脚趾&1170&10   //每次只发一条回来
+    QStringList list = data.split("|");
+    char result = data.at(0).toLatin1();
+    list.pop_front();
+    if(result == RES_Success)
+    {
+        if(list.at(0) == GlobalValues::g_localUser.getID())
+        {
+            list.pop_front(); //将链表中存储的buyerID删除
+            GlobalValues::g_shoesDetailsList->clear();
+            QString orderID = list.at(0);  //订单ID
+
+            QString shoesDetails = list.at(1);
+            qDebug() << shoesDetails;
+            QStringList infoList = shoesDetails.split("&");
+            ShoesDetails info;
+            info.setID(infoList.at(0));
+            info.setShoesID(infoList.at(1));
+            info.setPhotoID(infoList.at(2));
+            info.setSize(infoList.at(3));
+            info.setColor(infoList.at(4));
+            info.setPrice(infoList.at(5));
+            info.setStock(infoList.at(6));
+            GlobalValues::g_shoesDetailsList->append(info);
+
+
+
+            emit signalGetShoesDetailsByOrderResult(true, orderID);//将订单ID一并返回
+            qDebug() << "商品详情列表数量" << GlobalValues::g_shoesDetailsList->count();
+        }
+
+    }else
+    {
+        emit signalGetShoesDetailsByOrderResult(false, "错误");
+    }
+}
+void MsgProc::parseBuyerAddToShopCart(QString data)
+{
+    //p#  !|MH-011|添加购物车成功！
+    QStringList list = data.split("|");
+    char result = data.at(0).toLatin1();
+    list.pop_front();
+    if(result == RES_Success)
+    {
+        if(list.at(0) == GlobalValues::g_localUser.getID())
+        {
+            emit signalAddShopCartResult(true);
+        }
+    }else
+    {
+        emit signalAddShopCartResult(false);
+    }
+}
+void MsgProc::parseBuyerGetBuyerInfo(QString data)
+{
+    //B#   !|MH-011|MH-011&希筠&13411111111&山西省太原市杏花岭区
+    QStringList list = data.split("|");
+    char result = data.at(0).toLatin1();
+    list.pop_front();
+    if(result == RES_Success)
+    {
+        if(list.at(0) == GlobalValues::g_localUser.getID())
+        {
+
+            QStringList buyerInfo = list.at(1).split("&");
+            GlobalValues::g_buyerInfo->setID(buyerInfo.at(0));
+            GlobalValues::g_buyerInfo->setName(buyerInfo.at(1));
+            GlobalValues::g_buyerInfo->setTelephone(buyerInfo.at(2));
+            GlobalValues::g_buyerInfo->setAddress(buyerInfo.at(3));
+
+            emit signalGetBuyerInfoResult(true);
+
+        }
+    }else
+    {
+        emit signalGetBuyerInfoResult(false);
+    }
 }

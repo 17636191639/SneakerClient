@@ -12,5 +12,11 @@
         <file>icons/登录插图.png</file>
         <file>icons/登录背景.png</file>
         <file>icons/关闭.png</file>
+        <file>icons/个人中心.png</file>
+        <file>icons/订单.png</file>
+        <file>icons/购物车 (1).png</file>
+        <file>icons/联系卖家-订单详情.png</file>
+        <file>icons/聊天, chat.png</file>
+        <file>icons/鞋.png</file>
     </qresource>
 </RCC>

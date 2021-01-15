@@ -9,6 +9,12 @@ ShoesInfoList *GlobalValues::g_shoesInfoList = new ShoesInfoList;
 ShoesDetailsList *GlobalValues::g_shoesDetailsList = new ShoesDetailsList;
 PhotoInfoList *GlobalValues::g_photoInfoList = new PhotoInfoList;
 MainWindow *GlobalValues::g_mainWindow;
+OrderInfoList *GlobalValues::g_orderInfoList = new OrderInfoList;
+
+ShopCartList *GlobalValues::g_shopCartList = new ShopCartList;
+BuyerInfo *GlobalValues::g_buyerInfo = new BuyerInfo;
+
+
 
 void QSleep(unsigned int msec)
 {

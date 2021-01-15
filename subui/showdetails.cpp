@@ -3,6 +3,8 @@
 #include "globalvalues.h"
 #include "showimg.h"
 #include <QDebug>
+#include <QDateTime>
+
 ShowDetails::ShowDetails(const QString &shoesName, QWidget *parent) :
     Photo(parent),
     ui(new Ui::ShowDetails)
@@ -30,11 +32,11 @@ void ShowDetails::setDetails()
     //将所有尺码配色放到下拉框里
     for(int i = 0; i < GlobalValues::g_shoesDetailsList->count(); i++)
     {
-        if(ui->cb_size->findText(GlobalValues::g_shoesDetailsList->at(i).getSize()) == -1) //如果没有这个尺码就添加
+        if(ui->cb_size->findText(GlobalValues::g_shoesDetailsList->at(i).getSize()) == NOITEM) //如果没有这个尺码就添加
         {
             ui->cb_size->addItem(GlobalValues::g_shoesDetailsList->at(i).getSize());
         }
-        if(ui->cb_color->findText(GlobalValues::g_shoesDetailsList->at(i).getColor()) == -1)
+        if(ui->cb_color->findText(GlobalValues::g_shoesDetailsList->at(i).getColor()) == NOITEM)
         {
             ui->cb_color->addItem(GlobalValues::g_shoesDetailsList->at(i).getColor());
         }
@@ -48,6 +50,7 @@ void ShowDetails::setDetails()
         {
             if(ui->cb_size->currentText() == GlobalValues::g_shoesDetailsList->at(i).getSize())
             {
+                m_currentShoesDetailsID = GlobalValues::g_shoesDetailsList->at(i).getID();//设置当前商品详情ID
                 ui->lb_price->setText(GlobalValues::g_shoesDetailsList->at(i).getPrice());
                 ui->lb_stock->setText(GlobalValues::g_shoesDetailsList->at(i).getStock());
             }
@@ -65,6 +68,7 @@ void ShowDetails::setDetails()
 }
 bool ShowDetails::setPhoto()
 {
+    m_isLock = true;
     qDebug() << "ShowDetails::setPhoto()";
     ListWidgetItemToMap.clear();
     ui->listWidget->clear();
@@ -90,7 +94,7 @@ bool ShowDetails::setPhoto()
                         m_currentPhotoInfo.getID() + QString(" (%1).jpg").arg(i+1);
         qDebug() << "加载图片的路径：" << m_imgPath;
         ui->listWidget->addItem("");
-
+        emit signalAddDetailsPhoto(m_imgPath);
         ShowImg *item = new ShowImg(m_imgPath);
         if(!item->setPhoto())
         {
@@ -103,7 +107,7 @@ bool ShowDetails::setPhoto()
     }
     ui->lb_photo->setPixmap(QPixmap::fromImage(ListWidgetItemToMap[0]->getImage())
             .scaledToWidth(400, Qt::SmoothTransformation));
-
+    m_isLock = false;
     return true;
 }
 void ShowDetails::on_cb_size_currentTextChanged(const QString &arg1)
@@ -131,11 +135,12 @@ void ShowDetails::on_cb_color_currentTextChanged(const QString &arg1)
 {
     if(!m_isLock)
     {
-
+        //m_isLock = true;
         for(int i = 0; i < GlobalValues::g_shoesDetailsList->count(); i++)
         {
             if(arg1 == GlobalValues::g_shoesDetailsList->at(i).getColor())
             {
+                m_currentShoesDetailsID = GlobalValues::g_shoesDetailsList->at(i).getID();
                 m_currentPhotoInfo.setID(GlobalValues::g_shoesDetailsList->at(i).getPhotoID());
             }
         }
@@ -165,6 +170,34 @@ void ShowDetails::on_cb_color_currentTextChanged(const QString &arg1)
 
 void ShowDetails::on_listWidget_currentRowChanged(int currentRow)
 {
+    qDebug() << "ShowDetails::on_listWidget_currentRowChanged(int currentRow)";
+    if(m_isLock)
+    {
+        return;
+    }
+
     ui->lb_photo->setPixmap(QPixmap::fromImage(ListWidgetItemToMap[currentRow]->getImage())
-            .scaledToWidth(400, Qt::SmoothTransformation));
+                            .scaledToWidth(400, Qt::SmoothTransformation));
+}
+void ShowDetails::createOrder()
+{
+    m_orderUI = new CreateOrder(ui->lb_shoesName->text(),
+                        ui->lb_price->text(),
+                        ui->cb_size->currentText(),
+                        ui->cb_color->currentText(),
+                        QString::number(ui->sb_count->value()),
+                        ListWidgetItemToMap[0]->getImage(),
+                        m_currentShoesDetailsID);
+    m_orderUI->show();
+
+}
+void ShowDetails::addToShopCart()
+{
+    QString shopCartID = GlobalValues::g_localUser.getID();///购物车编号
+    //m_currentShoesDetailsID;
+    QString sendMsg = QString(CMD_AddToShopCart_p) + QString("#") + GlobalValues::g_localUser.getID() + QString("|") +
+                        shopCartID + QString("&") +
+                        m_currentShoesDetailsID + QString("&") +
+                        QString::number(ui->sb_count->value());
+    GlobalValues::g_mainWindow->slotSendMsgToServer(sendMsg);
 }

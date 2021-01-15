@@ -1,10 +1,8 @@
-#ifndef USERINFO_H
+﻿#ifndef USERINFO_H
 #define USERINFO_H
 
+//#include <QList>
 #include <QString>
-#include <QList>
-
-
 class UserInfo
 {
 public:
@@ -29,5 +27,5 @@ private:
     QString m_date;
 };
 
-typedef QList<UserInfo> UserInfoList;
+//typedef QList<UserInfo> UserInfoList;
 #endif // USERINFO_H

@@ -2,6 +2,7 @@
 #define PHOTO_H
 
 #include <QWidget>
+#include <QString>
 
 class Photo :public QWidget
 {

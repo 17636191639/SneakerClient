@@ -3,6 +3,7 @@
 #include "globalvalues.h"
 #include <QMessageBox>
 #include <QDesktopWidget>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -50,6 +51,8 @@ void MainWindow::slotLoginResult(bool result)
             qDebug() << "Seller UI Init";
         }else if(GlobalValues::g_localUser.getRole() == "买家")
         {
+            this->setWindowTitle("买家端");
+            //this->setWindowIcon(QIcon(":/new/prefix1/2.jpg"));//设置窗口图标
             initBuyerUI();
             setFixedSize(m_home->frameSize() + QSize(20, 80));
             QDesktopWidget* desktop = QApplication::desktop();
@@ -79,8 +82,33 @@ void MainWindow::initBuyerUI(void)
     connect(m_home, SIGNAL(signalGetShoesDetails(QString, QString)), this, SLOT(slotGetShoesDetails(QString, QString)));
     connect(m_msgProc, SIGNAL(signalGetShoesDetailsResult(bool)), m_home, SLOT(slotGetShoesDetailsResult(bool)));
     emit m_home->signalGetShoesInfo();
+    connect(m_msgProc, SIGNAL(signalAddShopCartResult(bool)), m_home, SLOT(slotAddShopCartResult(bool)));
 
+    m_messageUI = new MessageUI(ui->widget);
+
+    m_shopCartUI = new ShopCartUI(ui->widget);
+    connect(this, SIGNAL(signalRefreshShopCart()), m_shopCartUI, SLOT(slotAskShopCartInfoFromServer()));
+    connect(m_msgProc, SIGNAL(signalGetShopCartInfo(bool)), m_shopCartUI, SLOT(slotGetShopCartInfoResult(bool)));
+    connect(m_msgProc, SIGNAL(signalGetShoesDetailsFromDetailsIDResult(bool)), m_shopCartUI, SLOT(slotGetShoesDetailsFromDetailsIDResult(bool)));
+
+    m_orderUI = new OrderUI(ui->widget);
+    connect(this, SIGNAL(singalRefreshOrderUI()), m_orderUI, SLOT(slotAskOrderInfoToServer()));
+    connect(m_msgProc, SIGNAL(signalGetOrderInfoResult(bool)), m_orderUI, SLOT(slotGetOrderInfoResult(bool)));
+    connect(m_msgProc, SIGNAL(signalGetShoesDetailsByOrderResult(bool, QString)), m_orderUI, SLOT(slotGetShoesDetailsByOrderResult(bool, QString)));
+
+    m_personalUI = new PersonalUI(ui->widget);
+    connect(m_msgProc, SIGNAL(signalGetBuyerInfoResult(bool)), m_personalUI, SLOT(slotGetBuyerInfoResult(bool)) );
     m_home->show();
+    m_messageUI->hide();
+    m_orderUI->hide();
+    m_shopCartUI->hide();
+    m_personalUI->hide();
+
+    ui->home->setEnabled(false);
+    ui->message->setEnabled(true);
+    ui->shopcart->setEnabled(true);
+    ui->order->setEnabled(true);
+    ui->personalcenter->setEnabled(true);
 }
 void MainWindow::slotGetShoesInfo(void)
 {
@@ -109,4 +137,81 @@ void MainWindow::slotGetShoesDetails(QString buyerID, QString shoesID)
 void MainWindow::slotSendMsgToServer(QString msg)
 {
     m_msgProc->slotSendMsg(msg);
+}
+
+void MainWindow::on_home_triggered()
+{
+    m_home->show();
+    m_messageUI->hide();
+    m_orderUI->hide();
+    m_shopCartUI->hide();
+    m_personalUI->hide();
+
+    ui->home->setEnabled(false);
+    ui->message->setEnabled(true);
+    ui->shopcart->setEnabled(true);
+    ui->order->setEnabled(true);
+    ui->personalcenter->setEnabled(true);
+}
+
+void MainWindow::on_message_triggered()
+{
+    m_home->hide();
+    m_messageUI->show();
+    m_orderUI->hide();
+    m_shopCartUI->hide();
+    m_personalUI->hide();
+
+    ui->home->setEnabled(true);
+    ui->message->setEnabled(false);
+    ui->shopcart->setEnabled(true);
+    ui->order->setEnabled(true);
+    ui->personalcenter->setEnabled(true);
+}
+
+void MainWindow::on_shopcart_triggered()
+{
+    m_home->hide();
+    m_messageUI->hide();
+    m_orderUI->hide();
+    m_shopCartUI->show();
+    m_personalUI->hide();
+
+    ui->home->setEnabled(true);
+    ui->message->setEnabled(true);
+    ui->shopcart->setEnabled(false);
+    ui->order->setEnabled(true);
+    ui->personalcenter->setEnabled(true);
+    emit signalRefreshShopCart();
+}
+
+void MainWindow::on_order_triggered()
+{
+    m_home->hide();
+    m_messageUI->hide();
+    m_orderUI->show();
+    emit singalRefreshOrderUI();
+    m_shopCartUI->hide();
+    m_personalUI->hide();
+
+    ui->home->setEnabled(true);
+    ui->message->setEnabled(true);
+    ui->shopcart->setEnabled(true);
+    ui->order->setEnabled(false);
+    ui->personalcenter->setEnabled(true);
+}
+
+void MainWindow::on_personalcenter_triggered()
+{
+    m_home->hide();
+    m_messageUI->hide();
+    m_orderUI->hide();
+    m_shopCartUI->hide();
+    m_personalUI->show();
+
+    ui->home->setEnabled(true);
+    ui->message->setEnabled(true);
+    ui->shopcart->setEnabled(true);
+    ui->order->setEnabled(true);
+    ui->personalcenter->setEnabled(false);
 }
